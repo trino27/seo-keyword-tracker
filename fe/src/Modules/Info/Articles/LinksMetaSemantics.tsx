@@ -99,7 +99,10 @@ const ROBOTS_TOOLS = [
 const ROBOTS_RULES = [
 	{ rule: "all", means: "No restriction. The default — writing it changes nothing." },
 	{ rule: "noindex", means: "Keep this page out of search results." },
-	{ rule: "nofollow", means: "Do not follow the links on this page." },
+	{
+		rule: "nofollow",
+		means: "Do not follow the links on this page. Without this rule Google may discover new pages through them.",
+	},
 	{ rule: "none", means: "Both noindex and nofollow." },
 	{
 		rule: "nosnippet",
@@ -125,7 +128,7 @@ const ROBOTS_RULES = [
 	},
 	{
 		rule: "unavailable_after:[date]",
-		means: "Stop showing the page after this date (ignored if the date is invalid).",
+		means: "Stop showing the page after this date. Any widely adopted format will do — RFC 822, RFC 850, ISO 8601 and others; an invalid date is ignored. By default there is no expiry.",
 	},
 ] as const;
 
