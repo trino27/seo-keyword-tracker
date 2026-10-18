@@ -1,5 +1,6 @@
 import { Code, List, Table, Text } from "@mantine/core";
 import { DoAvoid } from "../DoAvoid/DoAvoid";
+import { QualitySpamSection } from "./QualitySpam";
 import { GuideSection } from "../GuideSection/GuideSection";
 import { GuidePart } from "../GuidePart/GuidePart";
 import { GUIDE_SECTIONS as S } from "../guideOutline";
@@ -197,6 +198,8 @@ export function BeyondTracker() {
 					]}
 				/>
 			</GuideSection>
+
+			<QualitySpamSection />
 
 			<GuideSection
 				section={S.searchConsole}

@@ -14,6 +14,7 @@ import {
 	formatCwvValue,
 } from "@Core/Helpers/DescribeCwv/describeCwv";
 import { DoAvoid } from "../DoAvoid/DoAvoid";
+import { CwvDiagnosticsSection } from "./CwvDiagnostics";
 import { GuideSection } from "../GuideSection/GuideSection";
 import { GuidePart } from "../GuidePart/GuidePart";
 import { GUIDE_SECTIONS as S } from "../guideOutline";
@@ -236,6 +237,8 @@ export function CoreWebVitalsGuide() {
 					]}
 				/>
 			</GuideSection>
+
+			<CwvDiagnosticsSection />
 
 			<GuideSection
 				section={S.speedHere}
