@@ -11,6 +11,15 @@ import {
 	SignalsInDepth,
 } from "./FundamentalsInDepth";
 import { LinkingSection, MetaRobotsSection, SemanticsSection } from "./LinksMetaSemantics";
+import {
+	CrawlDiscoverySection,
+	IndexDebuggingSection,
+	MobileFirstSection,
+	ServerLogsSection,
+} from "./CrawlingDeepDive";
+import { HttpHeadersSection, SitemapsSection, StatusRedirectsSection } from "./TechnicalDeepDive";
+import { DuplicatesSection, HreflangSection } from "./DuplicatesInternational";
+import { MetaRelSection } from "./MetaRelReference";
 
 const STAGES = [
 	{
@@ -169,7 +178,15 @@ export function SeoFundamentals() {
 				</List>
 			</GuideSection>
 
+			<CrawlDiscoverySection />
+
 			<CrawlIndexInDepth />
+
+			<IndexDebuggingSection />
+
+			<MobileFirstSection />
+
+			<ServerLogsSection />
 
 			<GuideSection
 				section={S.ranking}
@@ -293,6 +310,8 @@ export function SeoFundamentals() {
 
 			<SignalsInDepth />
 
+			<DuplicatesSection />
+
 			<GuideSection
 				section={S.technical}
 				sources={[
@@ -415,9 +434,19 @@ export function SeoFundamentals() {
 				</List>
 			</GuideSection>
 
+			<StatusRedirectsSection />
+
+			<SitemapsSection />
+
+			<HttpHeadersSection />
+
 			<RobotsTxtInDepth />
 
 			<MetaRobotsSection />
+
+			<MetaRelSection />
+
+			<HreflangSection />
 		</GuidePart>
 	);
 }
