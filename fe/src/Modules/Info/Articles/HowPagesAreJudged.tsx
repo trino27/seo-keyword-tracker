@@ -91,6 +91,12 @@ export function HowPagesAreJudged() {
 					</Table.Tbody>
 				</Table>
 				<Text>
+					On a page's Checks block these verdicts are the icons, and under each column's
+					heading are the counters: <i>judged</i> (passed and failed together — the
+					score's denominator), <i>not applicable</i> and <i>not yet checked</i> (
+					<i>not recorded</i> for Lighthouse).
+				</Text>
+				<Text>
 					Checks come from five places. <b>Per page</b> checks judge a page by itself;{" "}
 					<b>across the crawl</b> checks compare it with the other posts of the same crawl
 					(duplicate titles, near-duplicate text); <b>Lighthouse audits</b> are Google
@@ -98,16 +104,18 @@ export function HowPagesAreJudged() {
 					the page's score — the crawl's and Lighthouse's points are added together, each
 					check weighed by its level, and a page measured by Lighthouse is judged out of
 					more points than one that is not yet. <b>Google measurement</b> findings (Core
-					Web Vitals) and <b>whole site</b> checks (robots.txt, sitemap, host) appear as
-					issues but never change a page's score.
+					Web Vitals, and “Images could be a lot lighter”) and <b>whole site</b> checks
+					(robots.txt, sitemap, host) appear as issues but never change a page's score.
 				</Text>
 				<Text>
-					Today a crawl runs {FACTS.crawlChecks} checks on every page, Lighthouse scores
-					up to {FACTS.lighthouseChecks} audits, Google's measurement can add{" "}
-					{FACTS.speedFindings} speed findings, and {FACTS.siteChecks} checks judge the
-					site. Some crawl checks and Lighthouse audits look at the same thing — a missing
-					title, alt text, a canonical — on purpose: two independent readings, each
-					counted on its own side.
+					Today a crawl runs {FACTS.crawlChecks} checks on every page and Lighthouse
+					scores up to {FACTS.lighthouseChecks} audits. Google's measurement has{" "}
+					{FACTS.speedFindings} kinds of speed finding, but a page can hold at most one
+					per metric per device, plus the one about images: “needs improvement” and “poor”
+					for one metric rule each other out. Another {FACTS.siteChecks} checks judge the
+					site as a whole. Some crawl checks and Lighthouse audits look at the same thing
+					— a missing title, alt text, a canonical — on purpose: two independent readings,
+					each counted on its own side.
 				</Text>
 			</GuideSection>
 
@@ -282,11 +290,15 @@ export function HowPagesAreJudged() {
 						a title tail repeated across the site ("… | Blog").
 					</List.Item>
 					<List.Item>
-						<b>Scored by where they appear</b>: title 5, H1 4, URL slug 3, meta
-						description 2, H2/H3 2, first paragraph 1.5, and the body by how often (2.5
-						× ln(1 + occurrences)). Appearing in several deliberate places adds 25% per
-						extra place; a keyword the page declares itself (JSON-LD{" "}
-						<Code>keywords</Code>, <Code>article:tag</Code>) adds 15%.
+						<b>Scored by where they appear</b>: title 5, H1 4 — but only for the part
+						that names the subject (where a title or H1 is split by a colon, a question
+						mark or a dash, that is the part whose words the URL repeats; the other
+						parts weigh 2) — URL slug 3, meta description 2, H2/H3 2, first paragraph
+						1.5, and the body by how often (2.5 × ln(1 + occurrences)). Appearing in
+						several of the places an author fills deliberately (title, H1, URL, meta
+						description, subheadings) adds 25% per extra place; a keyword the page
+						declares itself (JSON-LD <Code>keywords</Code>, <Code>article:tag</Code>)
+						adds 15%.
 					</List.Item>
 					<List.Item>
 						<b>Adjusted</b>: a lone word is damped against a phrase; a word used on most
@@ -295,10 +307,11 @@ export function HowPagesAreJudged() {
 						longer phrase that contains it and says more.
 					</List.Item>
 					<List.Item>
-						<b>Kept</b>: the best ones that score at least a fifth of the top one, no
-						two overlapping by more than half their words, at most two from one
-						sentence. A short post keeps up to two, and every 400 words of text earns
-						one more, up to six. A post about one thing keeps one.
+						<b>Kept</b>: the best ones that score at least a fifth of the top one; no
+						two kept keywords may share half or more of the significant words of the
+						shorter of them, and at most two come from one sentence or heading. A short
+						post keeps up to two, and every 400 words of text earns one more, up to six.
+						A post about one thing keeps one.
 					</List.Item>
 				</List>
 				<Text>
@@ -327,8 +340,10 @@ export function HowPagesAreJudged() {
 			>
 				<Text>
 					A position is where a page ranks for one keyword: 1 is the first organic result.
-					Each keyword gets one position per day, and the page's <b>best position</b> is
-					its highest-ranking keyword.
+					Each keyword gets one position per day. A page's own position is the best of its
+					keywords' current positions: the <b>Latest position</b> column on the Pages
+					screen, and the stat of the same name on a page's card, with the keyword itself
+					named beneath it.
 				</Text>
 				<Text c="orange.8" fw={600}>
 					Positions in this version are {POSITION_SOURCE}: generated, not taken from
@@ -351,9 +366,10 @@ export function HowPagesAreJudged() {
 						<b>Below 20</b> — rarely seen.
 					</List.Item>
 					<List.Item>
-						<b>Change</b> — places gained over the range: positive is better (the number
-						got smaller).
-						<b> Best</b> and <b>worst</b> are the extremes over the chosen range.
+						In the <b>Position history</b> table: <b>Change</b> — places a keyword
+						gained over the chosen range, from its first position in the range to its
+						last; positive is better (the number got smaller). <b>Best</b> and{" "}
+						<b>worst</b> are the extremes over the same range.
 					</List.Item>
 					<List.Item>
 						The chart puts position 1 at the top, so a line going up is good.
@@ -362,7 +378,9 @@ export function HowPagesAreJudged() {
 				<Text>
 					Real positions are not one number: Google ranks for each search, and the user's
 					location, language and device change the results. That is why tools such as
-					Search Console report an <i>average</i> position.
+					Search Console report an <i>average</i> position — averaged over impressions.{" "}
+					<b>Average position</b> on a page's card is a different number: the mean of its
+					keywords' latest positions, across the keywords that have one.
 				</Text>
 			</GuideSection>
 		</GuidePart>

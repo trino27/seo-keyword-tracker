@@ -1,4 +1,5 @@
 import { Code, List, Table, Text } from "@mantine/core";
+import type { ISeoIssueSource } from "@app/contracts";
 import { DoAvoid } from "../DoAvoid/DoAvoid";
 import { GuideSection } from "../GuideSection/GuideSection";
 import { GuidePart } from "../GuidePart/GuidePart";
@@ -20,6 +21,103 @@ import {
 import { HttpHeadersSection, SitemapsSection, StatusRedirectsSection } from "./TechnicalDeepDive";
 import { DuplicatesSection, HreflangSection } from "./DuplicatesInternational";
 import { MetaRelSection } from "./MetaRelReference";
+
+/** Pages these chapters cite beyond the shared list; each was opened against its sentence on 2026-10-12. */
+const SOURCES = {
+	searchStatus: {
+		title: "Google Search Status Dashboard",
+		url: "https://status.search.google.com/",
+	},
+} satisfies Record<string, ISeoIssueSource>;
+
+/** The systems of Google's ranking systems guide, in its order, with what each means for a blog. */
+const RANKING_SYSTEMS = [
+	{
+		name: "BERT",
+		does: "An AI model that understands how a combination of words carries meaning and intent — prepositions and word order included.",
+		blog: "Write in natural language: the small words in a query matter.",
+	},
+	{
+		name: "Crisis information",
+		does: "On queries about a personal crisis it surfaces hotlines and material from trusted organisations; in natural disasters, SOS alerts.",
+		blog: "Barely touches a blog.",
+	},
+	{
+		name: "Deduplication",
+		does: "Shows only the most relevant of near-identical results; a page already shown in a featured snippet is not repeated below.",
+		blog: "Near-identical posts on a site compete with each other, and one of them is what gets shown.",
+	},
+	{
+		name: "Exact match domain",
+		does: "Keeps domains assembled around a query (best-seo-tips.com) from getting undue weight.",
+		blog: "A keyword in the domain will not help.",
+	},
+	{
+		name: "Freshness",
+		does: "“Query deserves freshness” (QDF) systems show more recent content where recency is expected.",
+		blog: "It depends on the query, not on the post's date: news, releases, “what changed in 2026” — yes; “what a canonical is” — no. Changing the date without changing the text does nothing.",
+	},
+	{
+		name: "Link analysis and PageRank",
+		does: "Uses how pages link to each other to understand what they are about and how useful they are. PageRank has changed since launch and remains part of the core systems.",
+		blog: "Internal links with clear anchors, and links from relevant sites.",
+	},
+	{
+		name: "Local news",
+		does: "Finds and surfaces local news sources in the Top stories and Local news blocks.",
+		blog: "Concerns news sites.",
+	},
+	{
+		name: "MUM",
+		does: "An AI model that understands and generates language. It is not used for general ranking — only for particular tasks, such as COVID-19 vaccine searches and featured-snippet callouts.",
+		blog: "No direct effect.",
+	},
+	{
+		name: "Neural matching",
+		does: "Connects the representations of concepts in queries and on pages.",
+		blog: "Cover the topic rather than repeating the phrase.",
+	},
+	{
+		name: "Original content",
+		does: "Places the original, original reporting included, above pages that merely quote it; it takes canonical markup into account.",
+		blog: "Your own data, experience and research; a copy at a partner is better left noindexed.",
+	},
+	{
+		name: "Removal-based demotion",
+		does: "Demotes sites with a high volume of valid removal requests — copyright, defamation, counterfeit, court orders — and sites with exploitative practices where there are many personal-information removals.",
+		blog: "Do not use other people's text and images without the rights.",
+	},
+	{
+		name: "Passage ranking",
+		does: "Judges individual sections of a page to work out its relevance.",
+		blog: "A section that answers a narrow question exactly can carry a long post for that query.",
+	},
+	{
+		name: "RankBrain",
+		does: "Connects words to concepts, so a page can rank without the query's exact words.",
+		blog: "Do not bend the text towards an exact match.",
+	},
+	{
+		name: "Reliable information",
+		does: "Raises authoritative pages, demotes low-quality ones and promotes quality journalism; where reliable results are scarce it shows a content advisory.",
+		blog: "Sources, an author with demonstrated expertise, accurate facts.",
+	},
+	{
+		name: "Reviews system",
+		does: "Rewards quality reviews: deep analysis and original research from people who know the subject.",
+		blog: "A review of a tool means your own tests, screenshots, comparisons, pros and cons.",
+	},
+	{
+		name: "Site diversity",
+		does: "Usually shows no more than two pages from one site in the top results; subdomains are generally treated as part of the main domain.",
+		blog: "A third page of yours for the same query will not normally make the top.",
+	},
+	{
+		name: "Spam detection",
+		does: "A continually updated set of systems, SpamBrain among them, against content and behaviour that break the spam policies.",
+		blog: "Keyword stuffing, cloaking, bought links, low-value content at scale.",
+	},
+] as const;
 
 const STAGES = [
 	{
@@ -93,7 +191,7 @@ const ON_PAGE = [
 	},
 	{
 		element: "URL",
-		does: "Shown in results and breadcrumbs; a light clue to the page's subject.",
+		does: "Shown in results (with breadcrumbs on desktop; on mobile, since 2025, the domain alone); a light clue to the page's subject.",
 		good: "Short, readable words separated by hyphens: /blog/local-seo-checklist.",
 		bad: "Session IDs, long parameter strings, several URLs for one page.",
 	},
@@ -107,7 +205,7 @@ const STATUS_CODES = [
 	},
 	{
 		code: "302 / 307",
-		google: "Temporary redirect: a weak signal. Google keeps showing the old URL. Use only for short-term moves.",
+		google: "Temporary redirect: Google follows it, but does not take it as a signal that the target should be the canonical — the original URL usually stays in results. Use it only for short-term moves: a temporary redirect left in place for long enough may eventually be treated as permanent.",
 	},
 	{
 		code: "404 / 410",
@@ -196,12 +294,17 @@ export function SeoFundamentals() {
 					SRC.starterGuide,
 					SRC.pageExperience,
 					SRC.spamPolicies,
+					SRC.coreUpdates,
+					SRC.performanceReport,
+					SRC.manualActions,
+					SOURCES.searchStatus,
 				]}
 			>
 				<Text>
 					Google ranks with many automated systems, not one formula, and publishes no
-					weights. The ones that matter most to a blog post, as Google's own guide
-					describes them:
+					weights. For every query they judge what the person means, which pages answer it
+					best, and how far those pages can be trusted. For a blog post it comes down to
+					six things:
 				</Text>
 				<List type="ordered" size="sm" spacing={6}>
 					<List.Item>
@@ -222,13 +325,15 @@ export function SeoFundamentals() {
 						sites are one of many signals.
 					</List.Item>
 					<List.Item>
-						<b>Freshness</b> — for searches where recent information is expected (news,
-						new releases).
+						<b>Freshness</b> — only for searches where recent information is expected
+						(news, new releases, current events). It is a property of the query, not of
+						the post: on an evergreen subject a new date buys nothing.
 					</List.Item>
 					<List.Item>
 						<b>Page experience</b> — Core Web Vitals, HTTPS, mobile-friendliness, no
-						intrusive pop-ups. It aligns with what the ranking systems reward, but
-						Google shows the most relevant page even when its experience is worse.
+						intrusive pop-ups. There is no separate “page experience system” in Google's
+						guide: the core ranking systems reward a good experience, but Google shows
+						the most relevant page even when its experience is worse.
 					</List.Item>
 					<List.Item>
 						<b>Spam detection.</b> Pages that break the spam policies (keyword stuffing,
@@ -239,6 +344,38 @@ export function SeoFundamentals() {
 					Results are also de-duplicated (near-identical pages are hidden) and usually
 					show at most two pages from one site.
 				</Text>
+
+				<Text fw={600}>The ranking systems, from Google's guide</Text>
+				<Text size="sm">
+					Google keeps a public list of the systems that run continuously — in its order:
+				</Text>
+				<Table withTableBorder withColumnBorders verticalSpacing={6} fz="sm">
+					<Table.Thead>
+						<Table.Tr>
+							<Table.Th w={190}>System</Table.Th>
+							<Table.Th>What it does</Table.Th>
+							<Table.Th>What it means for a blog</Table.Th>
+						</Table.Tr>
+					</Table.Thead>
+					<Table.Tbody>
+						{RANKING_SYSTEMS.map((row) => (
+							<Table.Tr key={row.name}>
+								<Table.Td fw={600}>{row.name}</Table.Td>
+								<Table.Td>{row.does}</Table.Td>
+								<Table.Td>{row.blog}</Table.Td>
+							</Table.Tr>
+						))}
+					</Table.Tbody>
+				</Table>
+				<Text size="sm">
+					The list of retired systems: the <b>helpful content system</b> (2022) became
+					part of the core ranking systems in March 2024 — there are no separate “helpful
+					content updates” any more, those signals are assessed continuously and move with
+					the core updates. Panda (2011, in the core since 2015) and Penguin (2012, since
+					2016) were absorbed the same way; Hummingbird (2013) was a milestone after which
+					the systems kept changing.
+				</Text>
+
 				<DoAvoid
 					goodTitle="What Google says matters"
 					badTitle="What Google says not to focus on"
@@ -255,11 +392,42 @@ export function SeoFundamentals() {
 						"The number or order of headings — it does not matter to ranking.",
 						'A "duplicate content penalty" — duplicates are inefficient, not penalised (copying others is different).',
 						"E-E-A-T as a ranking factor — it is not one; it describes what the systems look for.",
+						"Bumping the date without updating the text, for “freshness”.",
 					]}
 				/>
+
+				<Text fw={600}>How to work out why a position changed</Text>
+				<List type="ordered" size="sm" spacing={4}>
+					<List.Item>
+						Search Console → Performance: filter to the page and compare periods on the
+						queries tab. Did every query fall, or a few? Did impressions fall (the page
+						is losing visibility) or only clicks (the results page changed — an answer
+						block appeared, say)?
+					</List.Item>
+					<List.Item>
+						Line the date up with the Google Search Status Dashboard: a match with a
+						core update or a spam update points to a re-assessment of quality, not to a
+						technical fault.
+					</List.Item>
+					<List.Item>
+						Open Manual actions: an entry there means the cause is a manual penalty, not
+						the algorithms.
+					</List.Item>
+					<List.Item>
+						Look at the results for the main query: which intent the top pages serve,
+						how fresh and how thorough they are, and whether a second page of your own
+						is in there (deduplication, site diversity).
+					</List.Item>
+					<List.Item>
+						Rule out the technical causes: URL Inspection — the page is in the index,
+						the canonical is the right one, the content is visible after rendering.
+					</List.Item>
+				</List>
 				<Text size="sm" c="dimmed">
 					Changes take time: some show in hours, others take months. Wait a few weeks
-					before judging whether a change worked.
+					before judging whether a change worked. Positions in this version of the tracker
+					are generated (see “Positions”), so look for the causes of a change in Search
+					Console data.
 				</Text>
 			</GuideSection>
 
@@ -386,7 +554,10 @@ export function SeoFundamentals() {
 					<List.Item>
 						<b>Permanent (301, 308)</b> when a page has moved for good — Google shows
 						the new URL. <b>Temporary (302, 307)</b> only for short-term moves — Google
-						keeps the old one.
+						usually keeps the old one. Do not leave a temporary redirect in place for
+						months instead of a permanent one: Google may in time come to treat it as
+						permanent, but that is not something to rely on — if the move is for good,
+						use a 301.
 					</List.Item>
 					<List.Item>
 						Prefer server-side redirects. An instant meta refresh is read as permanent,
@@ -416,22 +587,29 @@ export function SeoFundamentals() {
 				<Text fw={600}>Also part of technical SEO</Text>
 				<List size="sm" spacing={4}>
 					<List.Item>
-						<b>HTTPS</b> everywhere, with plain HTTP redirected permanently — a
-						lightweight ranking signal, a strong trust signal.
+						<b>HTTPS</b> everywhere, with plain HTTP redirected permanently — a very
+						lightweight ranking signal, but a strong trust signal for readers and
+						browsers.
 					</List.Item>
 					<List.Item>
 						<b>Mobile-first indexing</b>: Google indexes the page its smartphone crawler
 						sees, so the mobile version must have the same content, links and markup.
 					</List.Item>
 					<List.Item>
-						<b>JavaScript</b>: Google renders it, later and not always; AI assistants'
-						crawlers do not run it at all. Text that matters belongs in the HTML.
+						<b>JavaScript</b>: Google renders it, later and not always successfully;
+						most AI assistants' crawlers do not run it at all. Text that matters belongs
+						in the HTML (see “Rendering and JavaScript”).
 					</List.Item>
 					<List.Item>
 						<b>One address per page</b>: one host (www or not), one scheme (https),
 						redirects from the rest, and a canonical.
 					</List.Item>
 				</List>
+				<Text size="sm" c="dimmed">
+					In more depth in “Status codes and redirects in detail”, “Sitemaps in detail”,
+					“HTTP headers for SEO”, “robots.txt in detail”, “Meta robots” and “Meta tags and
+					rel values: a reference”.
+				</Text>
 			</GuideSection>
 
 			<StatusRedirectsSection />

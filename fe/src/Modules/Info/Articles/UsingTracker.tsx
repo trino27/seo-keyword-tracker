@@ -19,8 +19,8 @@ const RUN_STATUS_MEANING = {
 	queued: "Waiting for the crawler to pick the run up.",
 	running: "Finding the sitemap and reading posts right now.",
 	succeeded: `All ${CRAWL_POST_LIMIT} posts were read; the pages and issues on screen are from this run.`,
-	partial: `Fewer than ${CRAWL_POST_LIMIT} posts could be read — the blog has fewer, or some entries failed. What was read is analysed; the run log says which entries failed and why.`,
-	failed: "Nothing could be analysed — the banner and the run log say why (site blocked, no blog sitemap, robots.txt forbids it…).",
+	partial: `Between 1 and ${CRAWL_POST_LIMIT - 1} posts were read — the blog has fewer, or some entries were skipped or failed to load. What was read is analysed; the run log says which entries failed and why.`,
+	failed: "No post could be read, so there is nothing to analyse — the banner on the Pages screen and the run log say why (the site blocks access, there is no blog sitemap, robots.txt forbids the crawl…).",
 } as const;
 
 /** Part one: what the tracker does with a client, step by step, and how each screen reads. */
@@ -42,8 +42,8 @@ export function UsingTracker() {
 				<Timeline active={7} bulletSize={26} lineWidth={2}>
 					<Timeline.Item bullet={<IconUserPlus size={14} />} title="1. You add a client">
 						<Text c="dimmed" size="sm">
-							A name and a website address on the Clients screen. A crawl starts at
-							once; Re-crawl runs it again later.
+							A Client name and a Website address in the “Add a client” form on the
+							Clients screen. A crawl starts at once; Re-crawl runs it again later.
 						</Text>
 					</Timeline.Item>
 					<Timeline.Item
@@ -154,13 +154,15 @@ export function UsingTracker() {
 						position.
 					</List.Item>
 					<List.Item>
-						<b>Best position</b> — the page's highest-ranking keyword, coloured Top 3 /
-						Top 10 / Top 20 / below.
+						<b>Latest position</b> — the best of the page's keywords' current positions,
+						coloured Top 3 / Top 10 / Top 20 / below 20; the keyword itself is named on
+						hover.
 					</List.Item>
 					<List.Item>
-						<b>LCP · INP · CLS</b> — the three Core Web Vitals coloured by Google's
+						<b>Core Web Vitals</b> — the mobile LCP, INP and CLS, coloured by Google's
 						band: green good, yellow needs improvement, red poor, grey no data. The
-						tooltip says the value, whose experience it is and when it was measured.
+						tooltip says the value, whose experience it is (this page's visitors, the
+						whole site's, or the lab test) and when it was measured.
 					</List.Item>
 					<List.Item>
 						<b>Issues</b> — counts by level; "2 site-wide" means two of the findings are
@@ -171,17 +173,23 @@ export function UsingTracker() {
 				<Text fw={600}>A page's detail</Text>
 				<List size="sm" spacing={4}>
 					<List.Item>
-						<b>Header</b> — the URL, the crawl time, and the response time of our one
-						fetch. That time is our crawler's network, not the page's speed, so it is
-						never an issue and never scored.
+						<b>Header</b> — the URL, the word count, the HTTP status, the language, the
+						time to first byte of our one fetch, and the crawl time. That time is our
+						crawler's network, not the page's speed for visitors, so it is never an
+						issue and never scored.
 					</List.Item>
 					<List.Item>
-						<b>Health score and "How this score is calculated"</b> — the score worked
-						out on this page's own numbers.
+						<b>The stats</b> — Health score with the checks it came from, Latest
+						position, Keywords, Average position and SEO issues.
 					</List.Item>
 					<List.Item>
-						<b>Speed</b> — LCP, INP and CLS with value, band and source, plus
-						Lighthouse's lab performance score as a caption.
+						<b>"How this score is calculated"</b> — the score worked out on this page's
+						own numbers.
+					</List.Item>
+					<List.Item>
+						<b>Speed (Core Web Vitals)</b> — LCP, INP and CLS with value, band and
+						source, with a Mobile / Desktop switch, and Lighthouse's lab scores
+						alongside: Performance, plus SEO and Accessibility on mobile.
 					</List.Item>
 					<List.Item>
 						<b>Position history</b> — a chart (position 1 at the top) and a table with
@@ -202,13 +210,15 @@ export function UsingTracker() {
 					Every problem across a client — or all clients — in plain words: what is wrong,
 					why it costs traffic, what to do and whom to ask, with the technical details
 					folded underneath. Group by issue (one card per problem, listing every page that
-					has it) or by page; filter by level, by type (SEO, Speed, Site) and by URL.
+					has it) or by page; filter by level, by type (SEO, Speed, Site) and search by
+					page URL or title.
 				</Text>
 				<Text fw={600}>Clients</Text>
 				<Text size="sm">
 					Add a client, see each crawl's status, re-crawl, and open the <b>run log</b>:
-					which sitemap was chosen and why, and every entry considered in sitemap order
-					with what happened to it — <Code>Crawled</Code>, <Code>Listing page</Code>,{" "}
+					which sitemap was chosen and why, the results of the Site checks, and every
+					entry considered in sitemap order with what happened to it —{" "}
+					<Code>Crawled</Code>, <Code>Listing page</Code>,{" "}
 					<Code>Blocked by robots.txt</Code>, <Code>Not a page</Code>,{" "}
 					<Code>Other site</Code> or <Code>Failed</Code>.
 				</Text>
