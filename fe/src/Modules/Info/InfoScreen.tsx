@@ -12,6 +12,7 @@ import { CoreWebVitalsGuide } from "./Articles/CoreWebVitalsGuide";
 import { HowPagesAreJudged } from "./Articles/HowPagesAreJudged";
 import { LighthouseOverview } from "./Articles/LighthouseOverview";
 import { SeoFundamentals } from "./Articles/SeoFundamentals";
+import { SpaGuide } from "./Articles/SpaGuide";
 import { UsingTracker } from "./Articles/UsingTracker";
 import { CheckReference } from "./CheckReference/CheckReference";
 import { GuideNav } from "./GuideNav/GuideNav";
@@ -75,6 +76,7 @@ export function InfoScreen() {
 							<HowPagesAreJudged />
 							<SeoFundamentals />
 							<CoreWebVitalsGuide />
+							<SpaGuide />
 							<GuidePart
 								title={CHECK_REFERENCE_TITLE}
 								lead="Every check the tracker runs, chapter by chapter. Open one to see when it passes, fails or is skipped, what passing gains and failing costs, an example of the right markup, how the tracker checks it and how to check it yourself, how to fix it, and the sources behind it."

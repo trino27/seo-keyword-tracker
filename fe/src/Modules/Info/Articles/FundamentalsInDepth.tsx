@@ -1,7 +1,7 @@
 import { Code, List, Table, Text } from "@mantine/core";
 import { DoAvoid } from "../DoAvoid/DoAvoid";
 import { GuideSection } from "../GuideSection/GuideSection";
-import { GUIDE_SECTIONS as S } from "../guideOutline";
+import { GUIDE_SECTIONS as S, SPA_PART_TITLE } from "../guideOutline";
 import { GUIDE_SOURCES as SRC } from "../guideSources";
 
 /** Which of the tracker's checks look at a subject, so each chapter ends on what to open next. */
@@ -77,6 +77,12 @@ export function CrawlIndexInDepth() {
 					Chromium) and <b>indexing</b> (storing what the rendered page says). Every page
 					that answers 200 is queued for rendering; it may wait seconds, sometimes longer.
 					Links found in the rendered page are queued for crawling in turn.
+				</Text>
+				<Text>
+					If the site is a single-page application (React, Vue or Angular with no
+					server-side rendering), this is only the general mechanism. How routes and
+					status codes, per-route metadata and Core Web Vitals work in an SPA, and how to
+					test them, is in the part “{SPA_PART_TITLE}”.
 				</Text>
 				<List size="sm" spacing={4}>
 					<List.Item>
