@@ -192,7 +192,7 @@ Every weight and threshold, and what each was measured against: [`docs/decisions
 
 Claude Code (Anthropic) throughout: interviewing the requirements into a plan and OpenSpec
 changes, test-first implementation phase by phase, and review. The plans are in
-`docs/_plans-archive/`, the thirteen changes they drove in `openspec/changes/archive/`.
+`docs/_plans-archive/`, the twenty-two changes they drove in `openspec/changes/archive/`.
 
 `be/` NestJS API · `fe/` React + Vite SPA · `packages/contracts/` what both sides share ·
 `caddy/` web server · `openspec/` requirements · `AGENTS.md` entry point for contributors.
