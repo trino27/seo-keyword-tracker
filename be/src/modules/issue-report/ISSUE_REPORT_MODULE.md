@@ -49,3 +49,6 @@ spec paths below are relative to `be/src/modules/issue-report/`.
 
 <!-- invariant: REPORT-004 -->
 **Reading a report makes no outbound request and writes nothing.** Pinned by `be/test/e2e/page-speed.e2e-spec.ts` -> "opening the list, the detail and the report requests nothing from PageSpeed and writes nothing" (no request to Google; `page_speed` unchanged). The database holds the other half: the snapshot transaction is `read only`, so a write inside it fails.
+
+<!-- invariant: REPORT-005 -->
+**A Lighthouse finding is reported at the page it was found on, never folded into a whole-site row, and it sits beside any crawl finding it repeats rather than replacing it.** Pinned by `be/test/e2e/issue-report.e2e-spec.ts` -> "reports a Lighthouse finding at each page it is on, never as a whole-site row"; `services/collapse-origin-findings/collapse-origin-findings.spec.ts` -> "keeps crawl findings per page, untouched" and "keeps IMAGE_DELIVERY_INEFFICIENT at its page, and folds origin-sourced desktop CWV codes into one row each"; the owner partition it relies on by `packages/contracts/src/domain/seo/seo-issue-catalogue.test.ts` -> "no code belongs to two owners". Specified in `openspec/specs/be/src/modules/issue-report/spec.md`.

@@ -22,11 +22,18 @@ for this stack and not restated here.
 here rather than in a document created to hold them.
 
 <!-- invariant: PAGEDETAIL-009 -->
-**The page detail lists every catalogue check with its outcome, and names the reason a skipped
-one was skipped.** The screen never derives a status: it renders what the backend composed, in
-the order given. Pinned by `fe/src/Modules/PageDetail/ChecksSection/ChecksSection.test.tsx` and
-`fe/src/ViewModels/PageDetailViewModel/Services/SummariseChecks/summariseChecks.test.ts`.
-Specified in `openspec/specs/fe/src/Modules/PageDetail/spec.md`.
+**The page detail lists every check of both scored owners, ours and Lighthouse's, in two columns
+under the chapters the Info tab teaches, and names the reason a skipped one was skipped.** The
+screen never derives a status: it renders what the backend composed, in the order given; an owner
+with no record shows one line in place of its cells, and a row where the two owners disagree
+carries a marker. Lighthouse's accessibility audits are not listed. Pinned by
+`fe/src/Modules/PageDetail/ChecksSection/ChecksSection.test.tsx` -> "lists our checks with the
+denominator, the skip reason, and one line for Lighthouse", "dates each column in the user's
+zone", "puts our five canonical checks beside Lighthouse's", "lists a Lighthouse-only failure
+first under its heading, with no cell of ours", "points nowhere when nothing failed", "asks for a
+re-crawl instead of inventing our verdicts" and "says a Lighthouse audit was not recorded rather
+than calling it passed"; and `fe/src/ViewModels/PageDetailViewModel/Services/SummariseChecks/
+summariseChecks.test.ts`. Specified in `openspec/specs/fe/src/Modules/PageDetail/spec.md`.
 
 <!-- invariant: PAGEDETAIL-010 -->
 **The score is explained on the page's own numbers, and bounded in what it claims.** The
@@ -131,7 +138,10 @@ Where a requirement is not pinned, that is said in words rather than left silent
 **The page's Speed block shows each metric's value, band, source and date, the lab score as a caption, and every state in words — queued, measuring, could not refresh, could not measure, not measured, not configured, key rejected — for the device its Mobile | Desktop switch shows, opening on Mobile; Desktop shows no SEO or accessibility caption, and switching requests nothing.** The switch is pinned by `SpeedSection.test.tsx` -> "opens on Mobile", "Desktop shows the desktop cards and its TTFB line", "Desktop shows no SEO or accessibility caption", "Desktop reads 'Not measured on desktop yet' for a page never queued on desktop", "Mobile reads 'Measuring…' while Desktop reads 'In queue'", "the key-rejected notice stands above both" and "switching makes no request". The rest is pinned by `Modules/PageDetail/SpeedSection/SpeedSection.test.tsx` -> "shows each metric's value, band and source", "a lab value says it may vary", "INP without data says why", "shows the lab performance score as a caption", "says a queued page is waiting in the queue", "says a running page is being measured", "under keyRejected the block opens with the key-rejected notice", "says PageSpeed is not configured without a key", "says why a page could not be measured", "keeps the old figures when a refresh failed, and says so". Specified in `openspec/specs/fe/src/Modules/PageDetail/spec.md`.
 
 <!-- invariant: PAGEDETAIL-012 -->
-**The score's explanation says speed is scored separately, and its arithmetic is unchanged.** Pinned by `ViewModels/PageDetailViewModel/Services/ExplainScore/explainScore.test.ts` -> "the fifth paragraph says speed is scored separately", beside PAGEDETAIL-010's cases, which did not change. Specified in `openspec/specs/fe/src/Modules/PageDetail/spec.md`.
+**The score's explanation says speed is scored separately, and says whose checks the number holds.** Its arithmetic is the weighted one the score came from; when Lighthouse's verdicts are in the number it says how many checks are ours and how many Lighthouse's and when Lighthouse measured the page, and when they are not it says why and that the score will move. Pinned by `ViewModels/PageDetailViewModel/Services/ExplainScore/explainScore.test.ts` -> "the fifth paragraph says speed is scored separately", "says how many of the checks are ours and how many Lighthouse's, and when", "says how many of the applicable checks passed, and what they were worth" and "never prints a quotient that rounds away from the score", beside PAGEDETAIL-010's cases. Specified in `openspec/specs/fe/src/Modules/PageDetail/spec.md`.
+
+<!-- invariant: PAGEDETAIL-013 -->
+**The Speed block shows the field TTFB on a line of its own, the share of visits under each metric, and where LCP's time went, each labelled with whose experience it is.** A lab value says it may vary, a missing one says why, and switching device makes no request. Pinned by `Modules/PageDetail/SpeedSection/SpeedSection.test.tsx` -> "shows the field TTFB on a line of its own, and the share of visits under a metric", "says there is no field TTFB, draws no share bar, and labels the breakdown lab", "draws an image LCP's four phases and a text LCP's two", "captions Lighthouse's SEO and accessibility scores", "Desktop shows the desktop cards and its TTFB line" and "switching makes no request". Specified in `openspec/specs/fe/src/Modules/PageDetail/spec.md`.
 
 <!-- invariant: SIGNIN-001 -->
 **One generic refusal for any bad credential, a distinct sentence for the throttle, and the inputs kept.** Pinned by `Modules/SignIn/SignInForm/SignInForm.test.tsx` -> "shows the refusal and keeps what was typed"; `Gateways/SessionGateway/SessionGateway.test.ts` -> "a 401 on login is { kind: 'invalid' }" and "a 429 on login is { kind: 'throttled' }". The absence of sign-up and reset offers is not pinned. Specified in `openspec/specs/fe/src/Modules/SignIn/spec.md`.

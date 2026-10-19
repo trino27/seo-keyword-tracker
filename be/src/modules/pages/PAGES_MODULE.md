@@ -56,15 +56,22 @@ ORDER BY captured_at DESC LIMIT 1` on the snapshot primary key; the best positio
 
 <!-- invariant: PAGES-012 -->
 
-**A page answers every crawl-owned catalogue check with one of four statuses.** Composed on the
-backend, in catalogue order, from the lists the crawl stored; a speed code is never a check
-entry (the composition iterates `ACTIVE_ISSUE_CODES`, crawl codes only, and `IPageCheck.code` is
-a `TCrawlIssueCode`; `fe/src/Gateways/PageGateway/Validation/PageSchemas.test.ts` -> "refuses a
-speed code"); a page whose crawl predates the recording says
-so rather than reporting a status it never observed. Pinned by
-`be/src/modules/pages/services/page-checks/compose-page-checks.spec.ts` (the four statuses, the
-catalogue order, the retired code, the null case),
-`be/src/modules/pages/services/page-read/page-read.service.spec.ts` -> `describe('PageReadService.getPage')`,
+**A page answers every scored owner's catalogue check with one of four statuses, each owner's
+list composed on its own or absent.** Composed on the backend, in catalogue order, from the lists
+that owner stored — the crawl's on the page row, Lighthouse's on the page's mobile measurement —
+so a check never recorded is told apart from one that was skipped; a speed code is never a check
+entry (`IPageCheck.code` is a scored owner's code; `fe/src/Gateways/PageGateway/Validation/
+PageSchemas.test.ts` -> "refuses a speed code"); an owner with no stored list says so rather than
+reporting a status it never observed, and the other owner's list does not depend on it. Pinned by
+`be/src/modules/pages/services/page-checks/compose-page-checks.spec.ts` -> "covers every running
+check exactly once, in catalogue order", "calls a judged check that did not fail passed",
+"separates a skipped check from a passed one", "calls a code the crawl never knew notYetChecked,
+not passed", "drops a stored code the catalogue no longer runs", "is null when the crawl predates
+the record", "covers every active Lighthouse code once, in its catalogue order, and no crawl or
+speed code", "lists no retired accessibility audit, even one a stored measurement failed", "calls
+a code the measurement did not record notYetChecked" and "is null for a page Lighthouse has not
+measured"; `be/src/modules/pages/services/page-read/page-read.service.spec.ts` -> "lists
+Lighthouse's checks beside ours" and the `describe('PageReadService.getPage')` cases;
 `be/src/modules/pages/repositories/pages/pages.repository.int-spec.ts` (the four refusals and the
 re-crawl overwrite) and `be/test/e2e/pages.e2e-spec.ts` ->
 "the detail answers for every catalogue check, and the answers add up".
@@ -124,7 +131,7 @@ named, the requirement lives in `openspec/specs/be/src/modules/pages/spec.md`.
 
 <!-- invariant: PAGES-009 -->
 
-**A page’s score is the rounded share of the applicable checks’ points it kept — each check weighing its severity (`SEVERITY_WEIGHT`: Critical 10, Important 3, Improvement 1) — always reported with the counts and points it came from.** The points are weighed at read time by `repositories/page-score/score-points.ts`, one lateral subquery both the list and the detail join, so the order and the number on screen are one formula and a weight changes without a migration. Pinned by `packages/contracts/src/domain/pages/page-score/page-score.util.test.ts` -> "rounds half up, so a page is never quietly marked down", "weighs a Critical failure above an Important one, and that above an Improvement" and "carries the counts and the points it was computed from"; `page-list.repository.int-spec.ts` -> "weighs a Critical failure above an Improvement, and a speed finding not at all"; `be/test/e2e/pages.e2e-spec.ts` -> "every item carries a score and the denominator it came from". "One implementation serves both sides" is NOT pinned — it rests on both workspaces importing `@app/contracts`.
+**A page’s score is the rounded share of the applicable checks’ points it kept — each check weighing its severity (`SEVERITY_WEIGHT`: Critical 10, Important 3, Improvement 1), summed over every scored owner, the crawl’s and Lighthouse’s alike — always reported with the counts, the points and each owner’s own share, an absent owner reported absent rather than as zero.** The points are weighed at read time by `repositories/page-score/score-points.ts`, one lateral subquery both the list and the detail join, so the order and the number on screen are one formula and a weight changes without a migration. Pinned by `packages/contracts/src/domain/pages/page-score/page-score.util.test.ts` -> "rounds half up, so a page is never quietly marked down", "weighs a Critical failure above an Important one, and that above an Improvement", "carries the counts and the points it was computed from", "sums the crawl and Lighthouse, counts and points alike", "lets an absent owner contribute nothing, and reports it absent" and "refuses to score a page nothing could be judged on"; `page-list.repository.int-spec.ts` -> "weighs a Critical failure above an Improvement, and a speed finding not at all", "orders by the score summed over the crawl and Lighthouse" and "compares scores as fractions, not as integer division"; `be/test/e2e/pages.e2e-spec.ts` -> "every item carries a score and the denominator it came from"; `be/test/e2e/page-speed.e2e-spec.ts` -> "a Lighthouse finding counts among the issues, in the spread and in the score". "One implementation serves both sides" is NOT pinned — it rests on both workspaces importing `@app/contracts`.
 
 <!-- invariant: PAGES-010 -->
 
@@ -141,6 +148,14 @@ named, the requirement lives in `openspec/specs/be/src/modules/pages/spec.md`.
 <!-- invariant: PAGES-014 -->
 
 **The list carries each page's mobile speed summary and the detail both devices' (`pageSpeedByStrategy`) — bands derived when read, never stored; the failure reason only for a failed row; null for a device never queued — and PageSpeed's state from `pageSpeedAvailabilityOf`.** The device half is pinned by `services/page-read/page-read.service.spec.ts` -> "the detail carries a summary per strategy, null where never queued" and "the score reads the mobile row whatever the desktop row holds", `page-list.repository.int-spec.ts` -> "lists a page once, with its mobile summary and score, when both strategies are stored", and `be/test/e2e/pages.e2e-spec.ts` -> "the detail carries pageSpeedByStrategy". The rest is pinned by `services/page-speed-summary/page-speed-summary-of.spec.ts` -> "a summary carries each metric's band from the thresholds", "a never-measured page has a null measurement", "INP without field data is null inside a measurement", "lastError is null unless failed", "a page never queued has no summary"; `services/page-read/page-read.service.spec.ts` -> "the availability state comes from pageSpeedAvailabilityOf" (through `PageSpeedAvailabilityService`); `be/test/e2e/page-speed.e2e-spec.ts` -> "the list and the detail carry the PageSpeed state", "every non-good badge in the list has its finding in the detail, and no good one does" and, for `keyRejected` on the list, "after Google rejects the key every row is still queued and the state is keyRejected". The frontend refuses an unknown band or state: `fe/src/Gateways/PageGateway/Validation/PageSchemas.test.ts` -> "refuses a summary with an unknown band" and "refuses an unknown availability state".
+
+<!-- invariant: PAGES-016 -->
+
+**A Lighthouse finding counts among a page's issues, in the client-wide spread and in the page's score, even where it repeats a crawl check — each owner's verdict counted on its own side.** Pinned by `be/test/e2e/page-speed.e2e-spec.ts` -> "a Lighthouse finding counts among the issues, in the spread and in the score"; `pages/repositories/page-list/page-list.repository.int-spec.ts` -> "orders by the score summed over the crawl and Lighthouse"; `pages/repositories/seo-issues/seo-issues.repository.int-spec.ts` -> "a desktop replace leaves the page's mobile, Lighthouse and crawl findings"; `packages/contracts/src/domain/pages/page-score/page-score.util.test.ts` -> "sums the crawl and Lighthouse, counts and points alike"; `packages/contracts/src/domain/seo/catalogue/issue-counterparts.test.ts` -> "puts a code in at most one group" and "spans at least two owners in every group".
+
+<!-- invariant: PAGES-017 -->
+
+**The measurement a page carries holds the field TTFB, each metric's shares of good and poor visits, the LCP breakdown and Lighthouse's category scores, every one of them optional.** Pinned by `pages/services/page-speed-summary/page-speed-summary-of.spec.ts`; `pages/repositories/page-speed/page-speed.repository.int-spec.ts` -> "accepts a whole measurement with every new part, and one without any"; `page-speed/services/extract-measurement/extract-measurement.spec.ts` -> "has no TTFB and no shares without field data — never from the lab" and "has no breakdown when the answer has none, and still reads the field data"; `fe/src/Gateways/PageGateway/Validation/PageSchemas.test.ts` for the wire shape. Specified in `openspec/specs/be/src/modules/pages/spec.md`.
 
 <!-- invariant: CRAWL-009 -->
 
