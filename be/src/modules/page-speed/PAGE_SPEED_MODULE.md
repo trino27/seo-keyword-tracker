@@ -128,8 +128,10 @@ source}`. The badge uses the same `cwvBandOf`, so a badge and its finding agree.
   page is re-measured — at the next crawl, for any measurement at least 24 h old. The catalogue's
   CWV bounds read the same constants (`seo-issue-catalogue.test.ts` holds them equal), so the two
   can only drift in time, never in value.
-- **Quota.** One call per current page and device per crawl at most — two per page, mobile and
-  desktop — and none for a device measured in the last 24 h. Measured live on 2026-10-11 (above):
+- **Quota.** One call per current page and device per crawl when nothing fails — two per page,
+  mobile and desktop — and none for a device measured in the last 24 h. A transient failure costs
+  more: up to five calls for one device, one per attempt, and a 429 release costs a call without
+  spending an attempt. Measured live on 2026-10-11 (above):
   4–5 measurements a minute, so a 15-post crawl takes 6–7 minutes to measure — 30 calls,
   against the 25 000 a day Google documents as the API's default (this project's own quota was
   not read from the Cloud console). A call takes 23.7 s at the median, 38.8 s at the 90th
@@ -200,7 +202,7 @@ and what pins it. Unless another path is named, the requirement lives in
 
 <!-- invariant: SPEED-012 -->
 
-**The key travels only in the `x-goog-api-key` header — never in a URL, a log line, a stored error or a fixture.** Pinned by `psi-client.spec.ts` -> "sends the key in a header and never in the URL"; `page-speed-executor.service.spec.ts` -> "no log line and no stored error contains the key". The fixtures are guarded by `be/test/fixtures/record-pagespeed-fixtures.ts`, which refuses an answer that echoes the key, and by the manual `git grep -n -E "key=|AIza" -- be/test/fixtures/pagespeed` — no test runs it.
+**The key travels only in the `x-goog-api-key` header — never in a URL, a log line, a stored error or a fixture.** Pinned by `psi-client.spec.ts` -> "sends the key in a header and never in the URL"; `page-speed-executor.service.spec.ts` -> "no log line and no stored error contains the key". The fixtures are guarded by `be/test/fixtures/record-pagespeed-fixtures.ts`, which refuses an answer that echoes the key, and by `_testing/page-speed-fixtures.spec.ts` -> "no answer carries an API key or a project number", which matches `/AIza[0-9A-Za-z_-]{30,}/` against every recorded answer.
 
 <!-- invariant: SPEED-013 -->
 
